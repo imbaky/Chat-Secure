@@ -1,0 +1,2 @@
+#Generate myroot certificate and publicKey
+openssl req -x509 -nodes -sha256 -days 365 -newkey rsa:4096 -keyout myroot.key -out myroot.crt -subj "/C=CA/ST=Montreal/O=Assignment 2/CN=SOEN321"
