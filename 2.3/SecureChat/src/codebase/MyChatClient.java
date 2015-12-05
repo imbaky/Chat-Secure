@@ -102,6 +102,7 @@ class MyChatClient extends ChatClient {
 			FileInputStream fis=new FileInputStream(path);
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			//TODO missing
+			
 			KeyFactory kf = KeyFactory.getInstance("RSA");
 			KeySpec keySpec = new PKCS8EncodedKeySpec(baos.toByteArray());
 			RSAPrivateKey privateKey =(RSAPrivateKey) kf.generatePrivate(keySpec); 
