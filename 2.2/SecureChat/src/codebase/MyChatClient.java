@@ -1,5 +1,6 @@
 package codebase;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -151,9 +152,9 @@ class MyChatClient extends ChatClient {
 	void RefreshList() {
 		String[] list = new String[chatlog.size()];
 		for (int i = 0; i < chatlog.size(); i++) {
-			String from = Decrypt(chatlog.getJsonObject(i).getString("from"));
-			String to = Decrypt(chatlog.getJsonObject(i).getString("to"));
-			String message = Decrypt(chatlog.getJsonObject(i).getString("message"));			
+			String from = chatlog.getJsonObject(i).getString("from");
+			String to = chatlog.getJsonObject(i).getString("to");
+			String message = chatlog.getJsonObject(i).getString("message");			
 			list[i] = (from + "->" + to + ": " + message);
 		}
 		UpdateMessages(list);
@@ -193,12 +194,31 @@ class MyChatClient extends ChatClient {
 					try {
 						ins = new FileInputStream(this.getChatLogPath());
 						
-						Reader reader = new InputStreamReader(ins);
-						String chat = Decrypt(reader.toString());
+						BufferedReader buffReader = new BufferedReader(new InputStreamReader(ins));
+
+						String chatString = "";
+					
+						//initialize the first line
+						String line = buffReader.readLine();
 						
+						//read the buffReader in chatString
+						while(line != null){
+							line = buffReader.readLine();
+							chatString = chatString + line;
+						}
 						
-						jsonReader = Json.createReader(new StringReader(chat));
+						//housekeeping
+						buffReader.close();
+						
+						//Decrypt the resulting chatString
+						chatString = Decrypt(chatString);
+						
+						//Json.createReader requires a reader as param
+						StringReader reader = new StringReader(chatString);
+						
+						jsonReader = Json.createReader(reader);
 						chatlog = jsonReader.readArray();
+						
 					} catch (FileNotFoundException e) {
 						System.err.println("Chatlog file could not be opened.");
 					}
@@ -254,9 +274,13 @@ class MyChatClient extends ChatClient {
 		try {
 			// The chatlog file is named after both the client and the user
 			// logged in
-
+			
 			OutputStream out = new FileOutputStream(this.getChatLogPath());
+			
+			//Replaced the json writer with a classic writer so that I can encrypt the entire chatlog 
 			Writer writer = new OutputStreamWriter(out);
+			
+			//write the encryted chatlog 
 			writer.write(Encrypt(chatlog.toString()));
 			writer.close();
 		} catch (IOException e) {
