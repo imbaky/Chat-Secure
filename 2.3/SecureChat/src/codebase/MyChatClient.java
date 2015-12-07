@@ -45,6 +45,8 @@ import java.security.interfaces.RSAPrivateKey;
 class MyChatClient extends ChatClient {
 
 	RSAPublicKey publicKey;
+	RSAPrivateKey privateKey;
+	
 	MyChatClient(boolean IsA) { // This is the minimum constructor you must
 								// preserve
 		super(IsA); // IsA indicates whether it's client A or B
@@ -78,6 +80,7 @@ class MyChatClient extends ChatClient {
 	 * @param path Selected certificate file's path
 	 */
 	public void FileLocationReceivedCert(File path) {
+		//@Reference code given in tutorial slides
 		try {
 			FileInputStream fis=new FileInputStream(path);
 			CertificateFactory cf=CertificateFactory.getInstance("X.509");
@@ -99,14 +102,21 @@ class MyChatClient extends ChatClient {
 	 */
 	public void FileLocationReceivedPriv(File path) {
 		try {
+			//@Reference code given in tutorial slides
 			FileInputStream fis=new FileInputStream(path);
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			//TODO missing
-			
+
+			byte[] buf = new byte[8129];
+			  for (int i; (i= fis.read(buf)) != -1;) {
+				  baos.write(buf, 0, i); 
+	            }
 			KeyFactory kf = KeyFactory.getInstance("RSA");
 			KeySpec keySpec = new PKCS8EncodedKeySpec(baos.toByteArray());
-			RSAPrivateKey privateKey =(RSAPrivateKey) kf.generatePrivate(keySpec); 
+			privateKey =(RSAPrivateKey) kf.generatePrivate(keySpec); 
 		} catch (NoSuchAlgorithmException | InvalidKeySpecException | FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
