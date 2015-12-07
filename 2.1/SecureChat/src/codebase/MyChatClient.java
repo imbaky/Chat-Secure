@@ -14,6 +14,10 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -121,9 +125,9 @@ class MyChatClient extends ChatClient {
 	void RefreshList() {
 		String[] list = new String[chatlog.size()];
 		for (int i = 0; i < chatlog.size(); i++) {
-			String from = chatlog.getJsonObject(i).getString("from");
-			String to = chatlog.getJsonObject(i).getString("to");
-			String message = chatlog.getJsonObject(i).getString("message");
+			String from = UniqueScramble(chatlog.getJsonObject(i).getString("from"));
+			String to = UniqueScramble(chatlog.getJsonObject(i).getString("to"));
+			String message = UniqueScramble(chatlog.getJsonObject(i).getString("message"));
 			list[i] = (from + "->" + to + ": " + message);
 		}
 		UpdateMessages(list);
@@ -267,8 +271,8 @@ class MyChatClient extends ChatClient {
 			builder.add(chatlog.getJsonObject(i));
 		}
 		try {
-			builder.add(Json.createObjectBuilder().add("from", from).add("to", to).add("time", "").add("message",
-					new String(buf, "UTF-8")));
+			builder.add(Json.createObjectBuilder().add("from", UniqueScramble(from)).add("to", UniqueScramble(to)).add("time", "").add("message",
+					UniqueScramble(new String(buf, "UTF-8"))));
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
@@ -277,4 +281,34 @@ class MyChatClient extends ChatClient {
 		RefreshList();
 
 	}
+	
+	private static String UniqueScramble(String text){
+		String cipher="";
+
+		InetAddress ip = null;
+				
+			try {
+				ip = InetAddress.getLocalHost();
+			} catch (UnknownHostException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			try {
+			NetworkInterface network;
+			
+				network = NetworkInterface.getByInetAddress(ip);
+				byte[] mac = network.getHardwareAddress();
+				StringBuilder sb = new StringBuilder();
+				for (int i = 0; i < mac.length; i++) {
+					sb.append(String.format("%02X%s", mac[i], (i < mac.length - 1) ? "-" : ""));		
+				}
+				String macStr=sb.toString();
+				for(int i=0;i<text.length();i++)cipher+=(char)(text.charAt(i)^macStr.charAt(i%(mac.length)));
+			} catch (SocketException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		
+		return cipher;}
 }
