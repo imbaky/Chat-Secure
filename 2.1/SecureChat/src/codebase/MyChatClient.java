@@ -282,6 +282,12 @@ class MyChatClient extends ChatClient {
 
 	}
 	
+	
+	/**
+	 * This method encrypts/decrypts strings using the Mac address of the computer 
+	 * @param text
+	 * @return 
+	 */
 	private static String UniqueScramble(String text){
 		String cipher="";
 
