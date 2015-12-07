@@ -18,6 +18,7 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.Date;
 
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -63,8 +64,9 @@ class MyChatClient extends ChatClient {
 		ChatPacket p = new ChatPacket();
 		p.request = ChatRequest.LOGIN;
 		p.uid = uid;
-		p.password = pwd;
-
+		// Hashing so that the middle man can't see the password in plain text
+		// Concatenating the Hashed time stamp to prevent replay attack
+		p.password = new Date().hashCode()+""+pwd.hashCode();
 		SerializeNSend(p);
 	}
 	
@@ -315,6 +317,8 @@ class MyChatClient extends ChatClient {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		
+			catch (NullPointerException e) {
+				System.err.println("You are not connected to the internet");
+			}
 		return cipher;}
 }

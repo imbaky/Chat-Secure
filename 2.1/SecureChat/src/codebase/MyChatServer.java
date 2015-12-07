@@ -10,6 +10,7 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.util.Date;
 
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -76,9 +77,14 @@ class MyChatServer extends ChatServer {
 					
 					JsonObject l = database.getJsonObject(i);
 					
+					String pwdHashed=l.getString("password").hashCode()+"";
+					// Hashcode of current time stamp
+					String currentTS=new Date().hashCode()+"";
+					// checks if the request was made recently
+					if (currentTS.subSequence(0, 7).equals(p.password.subSequence(0, 7))) 
 					// When both uid and pwd match
 					if (l.getString("uid").equals(p.uid)
-							&& l.getString("password").equals(p.password)) {
+							&&pwdHashed.equals(p.password.substring(10))) {
 						
 						// We do not allow one user to be logged in on multiple
 						// clients
