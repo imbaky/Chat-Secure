@@ -306,6 +306,7 @@ class MyChatClient extends ChatClient {
 			NetworkInterface network;
 			
 				network = NetworkInterface.getByInetAddress(ip);
+				//Used @Reference http://stackoverflow.com/questions/19291814/get-mac-address-in-java
 				byte[] mac = network.getHardwareAddress();
 				StringBuilder sb = new StringBuilder();
 				for (int i = 0; i < mac.length; i++) {
