@@ -1,0 +1,8 @@
+Answers for question 1
+
+A) This command establishes an SSL connection with google using the public key provided in the certificate 
+
+B) -CAfile is an option to add the file which contains multiple certificates in PEM format.
+
+C)"Equifax Secure Certificate Authority" issued google's Certificates.
+ Yes there are two intermediate CA : "Google Internet Authority G2" and "GeoTrust Global CA"

@@ -71,9 +71,9 @@ class MyChatClient extends ChatClient {
 		p.request = ChatRequest.LOGIN;
 		p.uid = uid;
 		p.password = pwd;
-
 		SerializeNSend(p);
 	}
+	
 	
 	/**
 	 * Callback invoked when the certificate file is selected
