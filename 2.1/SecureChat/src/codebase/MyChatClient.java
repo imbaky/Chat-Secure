@@ -127,9 +127,9 @@ class MyChatClient extends ChatClient {
 	void RefreshList() {
 		String[] list = new String[chatlog.size()];
 		for (int i = 0; i < chatlog.size(); i++) {
-			String from = UniqueScramble(chatlog.getJsonObject(i).getString("from"));
-			String to = UniqueScramble(chatlog.getJsonObject(i).getString("to"));
-			String message = UniqueScramble(chatlog.getJsonObject(i).getString("message"));
+			String from = xorWithMac(chatlog.getJsonObject(i).getString("from"));
+			String to = xorWithMac(chatlog.getJsonObject(i).getString("to"));
+			String message = xorWithMac(chatlog.getJsonObject(i).getString("message"));
 			list[i] = (from + "->" + to + ": " + message);
 		}
 		UpdateMessages(list);
@@ -273,8 +273,8 @@ class MyChatClient extends ChatClient {
 			builder.add(chatlog.getJsonObject(i));
 		}
 		try {
-			builder.add(Json.createObjectBuilder().add("from", UniqueScramble(from)).add("to", UniqueScramble(to)).add("time", "").add("message",
-					UniqueScramble(new String(buf, "UTF-8"))));
+			builder.add(Json.createObjectBuilder().add("from", xorWithMac(from)).add("to", xorWithMac(to)).add("time", "").add("message",
+					xorWithMac(new String(buf, "UTF-8"))));
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
@@ -290,7 +290,7 @@ class MyChatClient extends ChatClient {
 	 * @param text
 	 * @return 
 	 */
-	private static String UniqueScramble(String text){
+	private static String xorWithMac(String text){
 		String cipher="";
 
 		InetAddress ip = null;

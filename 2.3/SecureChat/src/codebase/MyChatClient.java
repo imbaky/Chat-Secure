@@ -15,6 +15,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
+import javax.crypto.Cipher;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
@@ -67,10 +68,12 @@ class MyChatClient extends ChatClient {
 	 * Someone clicks on the "Login" button
 	 */
 	public void LoginRequestReceived(String uid, String pwd) {
+		
 		ChatPacket p = new ChatPacket();
 		p.request = ChatRequest.LOGIN;
 		p.uid = uid;
 		p.password = pwd;
+	
 		SerializeNSend(p);
 	}
 	
