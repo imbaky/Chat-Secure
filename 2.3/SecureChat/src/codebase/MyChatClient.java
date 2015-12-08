@@ -2,6 +2,7 @@ package codebase;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -26,6 +27,7 @@ import infrastructure.ChatClient;
 import java.security.interfaces.RSAPublicKey;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.cert.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
@@ -104,24 +106,24 @@ class MyChatClient extends ChatClient {
 	 * @param path Selected private key file's path
 	 */
 	public void FileLocationReceivedPriv(File path) {
-		try {
-			//@Reference code given in tutorial slides
-			FileInputStream fis=new FileInputStream(path);
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		
+		  try{
 
-			byte[] buf = new byte[8129];
-			  for (int i; (i= fis.read(buf)) != -1;) {
-				  baos.write(buf, 0, i); 
-	            }
-			KeyFactory kf = KeyFactory.getInstance("RSA");
-			KeySpec keySpec = new PKCS8EncodedKeySpec(baos.toByteArray());
-			privateKey =(RSAPrivateKey) kf.generatePrivate(keySpec); 
-		} catch (NoSuchAlgorithmException | InvalidKeySpecException | FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			    File f = path;
+			    FileInputStream fis = new FileInputStream(f);
+			    DataInputStream dis = new DataInputStream(fis);
+			    byte[] keyBytes = new byte[(int)f.length()];
+			    dis.readFully(keyBytes);
+			    dis.close();
+
+			    PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
+			    KeyFactory kf = KeyFactory.getInstance("RSA");
+			    PrivateKey privateKey =  kf.generatePrivate(spec);
+			    System.out.println(privateKey.getFormat());
+		}catch(Exception e){
+			
+			System.err.println(e.getMessage());
+			
 		}
 		
 		
