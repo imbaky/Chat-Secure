@@ -6,3 +6,25 @@ B) -CAfile is an option to add the file which contains multiple certificates in 
 
 C)"Equifax Secure Certificate Authority" issued google's Certificates.
  Yes there are two intermediate CA : "Google Internet Authority G2" and "GeoTrust Global CA"
+ 
+ D) The Length of the public key for google is 2048 bit
+ 
+ E)The domain is located in the common name field.
+ 
+ subject=/C=US/ST=California/L=Mountain View/O=Google Inc/CN=google.com
+ C: Country
+ ST: State or province
+ L: Location Name
+ O: Organization name
+ CN: Common Name
+ 
+ F) 
+ 
+ 
+ 
+ G)
+ 
+ H)There are 97 root CA
+ 
+ I) Taiwan GRCA (from Taiwan)
+	Staat der Nederlanden Root CA (From Netherland)
