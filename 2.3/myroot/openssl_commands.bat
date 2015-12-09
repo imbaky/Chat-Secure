@@ -38,9 +38,14 @@ openssl req -config openssl.cnf -key server.key -new -sha256 -out server.csr -su
 
 openssl ca -config openssl.cnf -extensions server_cert -days 365 -notext -md sha256 -in server.csr -out server.crt
 
-openssl pkcs8 -topk8 -in alice.key -out alice.pk8
+REM openssl pkcs8 -topk8 -in alice.key -out alice.pk8
+
 REM pwd alice
-openssl pkcs8 -topk8 -in bob.key -out bob.pk8
+REM openssl pkcs8 -topk8 -in bob.key -out bob.pk8
+openssl pkcs8 -topk8 -inform PEM -outform DER -in alice.key -out alice.pk8 -nocrypt
 REM pwd bobkey
-openssl pkcs8 -topk8 -in server.key -out server.pk8
+REM openssl pkcs8 -topk8 -in server.key -out server.pk8
+openssl pkcs8 -topk8 -inform PEM -outform DER -in bob.key -out bob.pk8 -nocrypt
+
 REM pwd server
+openssl pkcs8 -topk8 -inform PEM -outform DER -in server.key -out server.pk8 -nocrypt
