@@ -107,9 +107,10 @@ class MyChatServer extends ChatServer {
 				
 			}
 				}else {
-					if(rsaUtils.loadCertificate(new File("../myroot/bob.crt")).equals(p.userPubk))
-						
-						if(rsaUtils.loadCertificate(new File("../myroot/alice.crt")).equals(p.userPubk)
+					
+					if(rsaUtils.loadCertificate(new File("../myroot/bob.crt")).equals(p.userPubk)){}
+					else	
+					if(rsaUtils.loadCertificate(new File("../myroot/alice.crt")).equals(p.userPubk)){}
 				}
 
 				if ((IsA ? statA : statB).equals("")) {
