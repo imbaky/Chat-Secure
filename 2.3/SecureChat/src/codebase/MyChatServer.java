@@ -11,9 +11,11 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.util.Random;
 
 import javax.json.Json;
@@ -122,13 +124,16 @@ class MyChatServer extends ChatServer {
 			}
 				}else {
 					
+					SecureRandom rand = new SecureRandom();
 					if(alicePubKey.equals(p.userPubk)){
-						statA=new Random().nextInt()+"";
+						statA = new BigInteger(1, rand).toString(32);
+						System.out.println(statA);
+						System.out.println(rsaUtils.Encrypt(statA,p.userPubk));
 						RespondtoClient(IsA, rsaUtils.Encrypt(statA,p.userPubk));
 					}
 					else	
 					if(bobPubKey.equals(p.userPubk)){
-						statB=new Random().nextInt()+"";
+						statB=new BigInteger(130, rand).toString(32);
 						RespondtoClient(IsA,  rsaUtils.Encrypt(statB,p.userPubk));
 					}
 				}
