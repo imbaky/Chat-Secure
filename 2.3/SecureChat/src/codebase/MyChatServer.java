@@ -11,6 +11,8 @@ import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.nio.charset.StandardCharsets;
+import java.security.PrivateKey;
 
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -40,9 +42,14 @@ class MyChatServer extends ChatServer {
 	String statA = "";
 	String statB = "";
 	RSAUtils rsaUtils;
+	private PrivateKey privateKey;
+	
 	// In Constructor, the user database is loaded.
 	MyChatServer() {
 		this.rsaUtils=new RSAUtils();
+		
+		this.privateKey = rsaUtils.loadPrivKey(new File("../myroot/server.pk8"));
+		
 		try {
 			InputStream in = new FileInputStream("database.json");
 			JsonReader jsonReader = Json.createReader(in);
@@ -133,6 +140,8 @@ class MyChatServer extends ChatServer {
 				if ((IsA && statA != "") || (!IsA && statB != "")) {
 					// Forward the original packet to the recipient
 					SendtoClient(!IsA, buf);
+					String msg  = rsaUtils.Decrypt(new String(p.data, StandardCharsets.UTF_8), privateKey);
+					System.out.println(msg);
 					p.request = ChatRequest.CHAT_ACK;
 					p.uid = (IsA ? statB : statA);
 
