@@ -2,6 +2,7 @@ package codebase;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -38,9 +39,10 @@ class MyChatServer extends ChatServer {
 	 **/
 	String statA = "";
 	String statB = "";
-
+	RSAUtils rsaUtils;
 	// In Constructor, the user database is loaded.
 	MyChatServer() {
+		this.rsaUtils=new RSAUtils();
 		try {
 			InputStream in = new FileInputStream("database.json");
 			JsonReader jsonReader = Json.createReader(in);
@@ -105,7 +107,9 @@ class MyChatServer extends ChatServer {
 				
 			}
 				}else {
-				
+					if(rsaUtils.loadCertificate(new File("../myroot/bob.crt")).equals(p.userPubk))
+						
+						if(rsaUtils.loadCertificate(new File("../myroot/alice.crt")).equals(p.userPubk)
 				}
 
 				if ((IsA ? statA : statB).equals("")) {
