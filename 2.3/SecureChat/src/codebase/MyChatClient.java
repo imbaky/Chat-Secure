@@ -80,12 +80,15 @@ class MyChatClient extends ChatClient {
 	 * Someone clicks on the "Login" button
 	 */
 	public void LoginRequestReceived(String uid, String pwd) {
-		
 		ChatPacket p = new ChatPacket();
 		p.request = ChatRequest.LOGIN;
-		p.uid = uid;
-		p.password = pwd;
-	
+		if(this.loginWPass){
+			p.uid = uid;
+			p.password = pwd;}
+		else {
+			p.userPubk=this.publicKey;
+		}
+		
 		SerializeNSend(p);
 	}
 	
