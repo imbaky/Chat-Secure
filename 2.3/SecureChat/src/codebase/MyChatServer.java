@@ -155,9 +155,10 @@ class MyChatServer extends ChatServer {
 					String msg  = rsaUtils.Decrypt(new String(p.data, StandardCharsets.UTF_8), privateKey);
 					PublicKey recipientPubKey = IsA ?  bobPubKey : alicePubKey;
 					p.data = rsaUtils.Encrypt(msg, recipientPubKey).getBytes();
+									
 					
 					// Forward the original packet to the recipient
-					SendtoClient(!IsA, buf);
+					SerializeNSend(!IsA, p);
 				
 //					//Encrypt Message using the Server's Public key
 //					String msg = RSAUtils.Encrypt(msg, );
@@ -166,6 +167,10 @@ class MyChatServer extends ChatServer {
 					
 					p.request = ChatRequest.CHAT_ACK;
 					p.uid = (IsA ? statB : statA);
+					
+					PublicKey senderPubKey = IsA ?  alicePubKey : bobPubKey;
+					
+					p.data = rsaUtils.Encrypt(msg, senderPubKey).getBytes();
 
 					// Flip the uid and send it back to the sender for updating
 					// chat history
