@@ -70,7 +70,8 @@ class MyChatServer extends ChatServer {
 			ChatPacket p = (ChatPacket) o;
 			
 			if (p.request == ChatRequest.LOGIN) {
-				
+			
+				if (p.loginWPWD){
 				// We want to go through all records
 				for (int i = 0; i < database.size(); i++) {
 					
@@ -101,6 +102,10 @@ class MyChatServer extends ChatServer {
 						break;
 					}
 
+				
+			}
+				}else {
+				
 				}
 
 				if ((IsA ? statA : statB).equals("")) {
