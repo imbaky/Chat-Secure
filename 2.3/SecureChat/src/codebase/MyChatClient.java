@@ -151,40 +151,16 @@ class MyChatClient extends ChatClient {
 		ChatPacket p = new ChatPacket();
 		p.request = ChatRequest.CHAT;
 		p.uid = curUser;
+		p.data = message;
+		ChatPacket clone = p;
 		
 		//Encrypt Message using the Server's Public key
 		String msg = RSAUtils.Encrypt(new String(message, StandardCharsets.UTF_8), serverPublicKey);
-		message = msg.getBytes();
-		
-		p.data = message;
-		SerializeNSend(p);
+		clone.data = msg.getBytes();
+
+		SerializeNSend(clone);
 	}
-	/*
-	 * try {
-		Cipher cipher=Cipher.getInstance("RSA/ECB/PKCS1Padding");
-		cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-		byte [] cipherText=cipher.doFinal("Hello".getBytes());
-		System.err.println(cipherText);
 	
-		cipher.init(Cipher.DECRYPT_MODE, privateKey);
-		System.err.println(new String(cipher.doFinal(cipherText), StandardCharsets.UTF_8));
-		
-	} catch (NoSuchAlgorithmException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	} catch (NoSuchPaddingException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	} catch (InvalidKeyException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	} catch (IllegalBlockSizeException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	} catch (BadPaddingException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}*/
 	/**
 	 * Methods for updating UI
 	 */
@@ -254,14 +230,18 @@ class MyChatClient extends ChatClient {
 				curUser = "";
 				UpdateMessages(null);
 			} else if (p.request == ChatRequest.CHAT && !curUser.equals("")) {
+				
 				// A new chat message received
-				p.data = rsaUtils.Decrypt(new String(p.data , StandardCharsets.UTF_8), privateKey).getBytes();
-
-				Add1Message(p.uid, curUser, p.data);
+				byte [] data = rsaUtils.Decrypt(new String(p.data , StandardCharsets.UTF_8), privateKey).getBytes();
+				Add1Message(p.uid, curUser, data);
+				
 			} else if (p.request == ChatRequest.CHAT_ACK && !curUser.equals("")) {
 				// This was sent by us and now it's confirmed by the server, add
 				// it to chat history
-				Add1Message(curUser, p.uid, p.data);
+				
+				
+				byte [] data = rsaUtils.Decrypt(new String(p.data , StandardCharsets.UTF_8), privateKey).getBytes();
+				Add1Message(curUser, p.uid, data);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
