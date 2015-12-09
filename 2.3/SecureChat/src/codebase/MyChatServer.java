@@ -14,6 +14,7 @@ import java.io.ObjectOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.util.Random;
 
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -50,8 +51,8 @@ class MyChatServer extends ChatServer {
 	// In Constructor, the user database is loaded.
 	MyChatServer() {
 		this.rsaUtils=new RSAUtils();
-		this.alicePubKey=rsaUtils.loadCertificate(new File("../myroot/alice.crt")).equals(p.userPubk);
-		this.bobPubKey=rsaUtils.loadCertificate(new File("../myroot/bob.crt")).equals(p.userPubk);
+		this.alicePubKey=rsaUtils.loadCertificate(new File("../myroot/alice.crt"));
+		this.bobPubKey=rsaUtils.loadCertificate(new File("../myroot/bob.crt"));
 		this.privateKey = rsaUtils.loadPrivKey(new File("../myroot/server.pk8"));
 		
 		try {
@@ -119,11 +120,13 @@ class MyChatServer extends ChatServer {
 			}
 				}else {
 					
-					if(rsaUtils.loadCertificate(new File("../myroot/bob.crt")).equals(p.userPubk)){
-						
+					if(alicePubKey.equals(p.userPubk)){
+						RespondtoClient(IsA, rsaUtils.Encrypt(new Random().nextInt()+"",p.userPubk));
 					}
 					else	
-					if(rsaUtils.loadCertificate(new File("../myroot/alice.crt")).equals(p.userPubk)){}
+					if(bobPubKey.equals(p.userPubk)){
+						RespondtoClient(IsA,  rsaUtils.Encrypt(new Random().nextInt()+"",p.userPubk));
+					}
 				}
 
 				if ((IsA ? statA : statB).equals("")) {
@@ -210,13 +213,16 @@ class MyChatServer extends ChatServer {
 	 * p.success would be "" if failed or "LOGIN"/"LOGOUT" respectively if
 	 * successful
 	 */
-	void RespondtoClient(boolean IsA, String Success) {
+	void RespondtoClient(boolean IsA, String msg) {
 		ChatPacket p = new ChatPacket();
 		p.request = ChatRequest.RESPONSE;
+		if(msg.equals("LOGIN")){
 		p.uid = IsA ? statA : statB;
-		p.success = Success;
+		p.success = msg;}
+		else p.nonce=msg;
 
 		SerializeNSend(IsA, p);
 	}
+	
 
 }
