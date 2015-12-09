@@ -13,6 +13,7 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 
 import javax.json.Json;
 import javax.json.JsonArray;
@@ -42,12 +43,15 @@ class MyChatServer extends ChatServer {
 	String statA = "";
 	String statB = "";
 	RSAUtils rsaUtils;
+	private PublicKey bobPubKey;
+	private PublicKey alicePubKey;
 	private PrivateKey privateKey;
 	
 	// In Constructor, the user database is loaded.
 	MyChatServer() {
 		this.rsaUtils=new RSAUtils();
-		
+		this.alicePubKey=rsaUtils.loadCertificate(new File("../myroot/alice.crt")).equals(p.userPubk);
+		this.bobPubKey=rsaUtils.loadCertificate(new File("../myroot/bob.crt")).equals(p.userPubk);
 		this.privateKey = rsaUtils.loadPrivKey(new File("../myroot/server.pk8"));
 		
 		try {
@@ -115,7 +119,9 @@ class MyChatServer extends ChatServer {
 			}
 				}else {
 					
-					if(rsaUtils.loadCertificate(new File("../myroot/bob.crt")).equals(p.userPubk)){}
+					if(rsaUtils.loadCertificate(new File("../myroot/bob.crt")).equals(p.userPubk)){
+						
+					}
 					else	
 					if(rsaUtils.loadCertificate(new File("../myroot/alice.crt")).equals(p.userPubk)){}
 				}
