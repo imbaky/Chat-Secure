@@ -56,6 +56,7 @@ class MyChatClient extends ChatClient {
 	PublicKey publicKey;
 	PrivateKey privateKey;
 	PublicKey serverPublicKey;
+	boolean loginWPass=true;
 	
 	MyChatClient(boolean IsA) { // This is the minimum constructor you must
 								// preserve
@@ -154,31 +155,7 @@ class MyChatClient extends ChatClient {
 	 */
 	public void ReceivedMode(boolean IsPWD) {
 		// TODO
-		try {
-			Cipher cipher=Cipher.getInstance("RSA/ECB/PKCS1Padding");
-			cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-			byte [] cipherText=cipher.doFinal("Hello".getBytes());
-			System.err.println(cipherText);
-		
-			cipher.init(Cipher.DECRYPT_MODE, privateKey);
-			System.err.println(new String(cipher.doFinal(cipherText), StandardCharsets.UTF_8));
-			
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NoSuchPaddingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InvalidKeyException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IllegalBlockSizeException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (BadPaddingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		this.loginWPass=IsPWD;		
 	}
 
 
@@ -203,7 +180,32 @@ class MyChatClient extends ChatClient {
 		p.data = message;
 		SerializeNSend(p);
 	}
-
+	/*
+	 * try {
+		Cipher cipher=Cipher.getInstance("RSA/ECB/PKCS1Padding");
+		cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+		byte [] cipherText=cipher.doFinal("Hello".getBytes());
+		System.err.println(cipherText);
+	
+		cipher.init(Cipher.DECRYPT_MODE, privateKey);
+		System.err.println(new String(cipher.doFinal(cipherText), StandardCharsets.UTF_8));
+		
+	} catch (NoSuchAlgorithmException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	} catch (NoSuchPaddingException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	} catch (InvalidKeyException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	} catch (IllegalBlockSizeException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	} catch (BadPaddingException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}*/
 	/**
 	 * Methods for updating UI
 	 */
