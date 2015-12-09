@@ -19,6 +19,7 @@ public class ChatPacket implements java.io.Serializable{
 	public String uid;
 	public String password;
 	public String success;
+	public String nonce;
 	public PublicKey userPubk;
 	public boolean loginWPWD;
 	byte[] data;
