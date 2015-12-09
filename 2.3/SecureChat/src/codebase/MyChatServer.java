@@ -16,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.Random;
 
 import javax.json.Json;
@@ -90,51 +91,60 @@ class MyChatServer extends ChatServer {
 			if (p.request == ChatRequest.LOGIN) {
 			
 				if (p.loginWPWD){
-				// We want to go through all records
-				for (int i = 0; i < database.size(); i++) {
-					
-					JsonObject l = database.getJsonObject(i);
-					
-					// When both uid and pwd match
-					if (l.getString("uid").equals(p.uid)
-							&& l.getString("password").equals(p.password)) {
+					// We want to go through all records
+					for (int i = 0; i < database.size(); i++) {
 						
-						// We do not allow one user to be logged in on multiple
-						// clients
-						if (p.uid.equals(IsA ? statB : statA))
-							continue;
+						JsonObject l = database.getJsonObject(i);
 						
-						// Update the corresponding login status
-						if (IsA) {
-							statA = l.getString("uid");
-						} else {
-							statB = l.getString("uid");
+						// When both uid and pwd match
+						if (l.getString("uid").equals(p.uid)
+								&& l.getString("password").equals(p.password)) {
+							
+							// We do not allow one user to be logged in on multiple
+							// clients
+							if (p.uid.equals(IsA ? statB : statA))
+								continue;
+							
+							// Update the corresponding login status
+							if (IsA) {
+								statA = l.getString("uid");
+							} else {
+								statB = l.getString("uid");
+							}
+							
+							// Update the UI to indicate this
+							UpdateLogin(IsA, l.getString("uid"));
+							
+							// Inform the client that it was successful
+							RespondtoClient(IsA, "LOGIN");
+							
+							break;
 						}
-						
-						// Update the UI to indicate this
-						UpdateLogin(IsA, l.getString("uid"));
-						
-						// Inform the client that it was successful
-						RespondtoClient(IsA, "LOGIN");
-						
-						break;
 					}
-
-				
-			}
 				}else {
 					
 					SecureRandom rand = new SecureRandom();
+					
 					if(alicePubKey.equals(p.userPubk)){
-						statA = new BigInteger(1, rand).toString(32);
-						System.out.println(statA);
-						System.out.println(rsaUtils.Encrypt(statA,p.userPubk));
-						RespondtoClient(IsA, rsaUtils.Encrypt(statA,p.userPubk));
+						//Create a random nonce 
+						byte[] b = new byte[50];
+						rand.nextBytes(b);
+						
+						statA = new String(b, StandardCharsets.UTF_8);
+						
+						//Send encrypted nonce to client 
+						//if he manages to send decrypt and send it back, we know that the user is authentic
+						RespondtoClient(IsA, rsaUtils.Encrypt(statA ,p.userPubk));
 					}
 					else	
 					if(bobPubKey.equals(p.userPubk)){
-						statB=new BigInteger(130, rand).toString(32);
-						RespondtoClient(IsA,  rsaUtils.Encrypt(statB,p.userPubk));
+						//Create a random nonce 
+						byte[] b = new byte[50];
+						rand.nextBytes(b);
+						
+						statB = new String(b, StandardCharsets.UTF_8);
+						
+						RespondtoClient(IsA, rsaUtils.Encrypt(statB ,p.userPubk));
 					}
 				}
 
@@ -164,11 +174,6 @@ class MyChatServer extends ChatServer {
 					
 					// Forward the original packet to the recipient
 					SerializeNSend(!IsA, p);
-				
-//					//Encrypt Message using the Server's Public key
-//					String msg = RSAUtils.Encrypt(msg, );
-//					message = msg.getBytes();
-
 					
 					p.request = ChatRequest.CHAT_ACK;
 					p.uid = (IsA ? statB : statA);
@@ -183,7 +188,7 @@ class MyChatServer extends ChatServer {
 				}
 			}else if(p.request==ChatRequest.AUTHENTICATION){
 				if(IsA){
-					if(rsaUtils.Encrypt(p.nonce, this.bobPubKey).equals(statA)){
+					if(rsaUtils.Decrypt(p.nonce, privateKey).equals(statA)){
 						// Update the UI to indicate this
 						UpdateLogin(IsA, "Alice");
 						
@@ -194,7 +199,7 @@ class MyChatServer extends ChatServer {
 						// Oops, this means a failure, we tell the client so
 						RespondtoClient(IsA, "");}
 						
-				}else  if(rsaUtils.Encrypt(p.nonce, this.bobPubKey).equals(statB)){
+				}else  if(rsaUtils.Decrypt(p.nonce, privateKey).equals(statB)){
 					// Update the UI to indicate this
 					UpdateLogin(IsA, "Bob");
 					
@@ -263,12 +268,14 @@ class MyChatServer extends ChatServer {
 	void RespondtoClient(boolean IsA, String msg) {
 		ChatPacket p = new ChatPacket();
 		p.request = ChatRequest.RESPONSE;
-		if(msg.equals("LOGIN")){
-		p.uid = IsA ? statA : statB;
-		p.success = msg;}
+		
+		if(msg.equals("LOGIN")||msg.equals("LOGOUT")){
+			p.uid = IsA ? statA : statB;
+			p.success = msg;}
 		else {
-			p.success="Authenticate";
-			p.nonce=msg;}
+			p.success = "Authenticate";
+			p.nonce = msg;
+		}
 
 		SerializeNSend(IsA, p);
 	}
