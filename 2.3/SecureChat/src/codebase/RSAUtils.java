@@ -1,8 +1,17 @@
 package codebase;
 
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
 
 import javax.crypto.Cipher;
@@ -60,4 +69,45 @@ public class RSAUtils {
 			 return null;
 	
 	}
+	public static PublicKey loadCertificate(File path) {
+		try {
+			
+			FileInputStream fis=new FileInputStream(path);
+			CertificateFactory cf=CertificateFactory.getInstance("X.509");
+			Certificate cert=cf.generateCertificate(fis);
+			
+			return(cert.getPublicKey());
+			
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (CertificateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+	public static PrivateKey loadPrivKey(File path) {
+		try{
+
+		    File f = path;
+		    FileInputStream fis = new FileInputStream(f);
+		    DataInputStream dis = new DataInputStream(fis);
+		    byte[] keyBytes = new byte[(int)f.length()];
+		    dis.readFully(keyBytes);
+		    dis.close();
+
+		    PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
+		    KeyFactory kf = KeyFactory.getInstance("RSA");
+		    PrivateKey privateKey =  kf.generatePrivate(spec);
+		    return privateKey;
+		
+	}catch(Exception e){
+		
+		System.err.println(e.getMessage());
+		
+	}
+		return null;
+	}
+	
 }

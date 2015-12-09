@@ -58,7 +58,7 @@ class MyChatClient extends ChatClient {
 	PrivateKey privateKey;
 	PublicKey serverPublicKey;
 	boolean loginWPass=true;
-
+	RSAUtils rsaUtils;
 
 	
 	MyChatClient(boolean IsA) { // This is the minimum constructor you must
@@ -66,7 +66,8 @@ class MyChatClient extends ChatClient {
 		super(IsA); // IsA indicates whether it's client A or B
 		startComm(); // starts the communication
 		File serverCert = new File("../myroot/server.crt");
-		serverPublicKey = loadCertificate(serverCert);
+		this.rsaUtils=new RSAUtils();
+		serverPublicKey = rsaUtils.loadCertificate(serverCert);
 		
 		
 		
@@ -105,29 +106,12 @@ class MyChatClient extends ChatClient {
 	 */
 	public void FileLocationReceivedCert(File path) {
 		//@Reference code given in tutorial slides
-		this.publicKey = loadCertificate(path);
+	
+		this.publicKey = rsaUtils.loadCertificate(path);
 		
 	}
 
 
-	public PublicKey loadCertificate(File path) {
-		try {
-			
-			FileInputStream fis=new FileInputStream(path);
-			CertificateFactory cf=CertificateFactory.getInstance("X.509");
-			Certificate cert=cf.generateCertificate(fis);
-			
-			return(cert.getPublicKey());
-			
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (CertificateException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return null;
-	}
 	
 	/**
 	 * Callback invoked when the private key file is selected
@@ -135,25 +119,7 @@ class MyChatClient extends ChatClient {
 	 */
 	public void FileLocationReceivedPriv(File path) {
 		
-		  try{
-
-			    File f = path;
-			    FileInputStream fis = new FileInputStream(f);
-			    DataInputStream dis = new DataInputStream(fis);
-			    byte[] keyBytes = new byte[(int)f.length()];
-			    dis.readFully(keyBytes);
-			    dis.close();
-
-			    PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
-			    KeyFactory kf = KeyFactory.getInstance("RSA");
-			    PrivateKey privateKey =  kf.generatePrivate(spec);
-			    this.privateKey= privateKey;
-			    System.out.println(privateKey.getFormat());
-		}catch(Exception e){
-			
-			System.err.println(e.getMessage());
-			
-		}
+		 privateKey=rsaUtils.loadPrivKey(path);
 		
 		
 	}
