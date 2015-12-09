@@ -13,8 +13,8 @@ serial            = $dir/serial
 RANDFILE          = $dir/private/.rand
 
 # The root key and root certificate.
-private_key       = $dir/private/ca.key.pem
-certificate       = $dir/certs/ca.cert.pem
+private_key       = $dir/ca.key
+certificate       = $dir/ca.crt
 
 # For certificate revocation lists.
 crlnumber         = $dir/crlnumber
@@ -132,4 +132,4 @@ basicConstraints = CA:FALSE
 subjectKeyIdentifier = hash
 authorityKeyIdentifier = keyid,issuer
 keyUsage = critical, digitalSignature
-extendedKeyUsage = critical, OCSPSigning
+extendedKeyUsage = critical, OCSPSigning 
