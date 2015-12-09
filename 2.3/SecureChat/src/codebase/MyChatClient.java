@@ -255,6 +255,8 @@ class MyChatClient extends ChatClient {
 				UpdateMessages(null);
 			} else if (p.request == ChatRequest.CHAT && !curUser.equals("")) {
 				// A new chat message received
+				p.data = rsaUtils.Decrypt(new String(p.data , StandardCharsets.UTF_8), privateKey).getBytes();
+
 				Add1Message(p.uid, curUser, p.data);
 			} else if (p.request == ChatRequest.CHAT_ACK && !curUser.equals("")) {
 				// This was sent by us and now it's confirmed by the server, add

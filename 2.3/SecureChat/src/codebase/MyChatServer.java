@@ -49,10 +49,10 @@ class MyChatServer extends ChatServer {
 	
 	// In Constructor, the user database is loaded.
 	MyChatServer() {
-		this.rsaUtils=new RSAUtils();
-		this.alicePubKey=rsaUtils.loadCertificate(new File("../myroot/alice.crt")).equals(p.userPubk);
-		this.bobPubKey=rsaUtils.loadCertificate(new File("../myroot/bob.crt")).equals(p.userPubk);
-		this.privateKey = rsaUtils.loadPrivKey(new File("../myroot/server.pk8"));
+		this.rsaUtils    = new RSAUtils();
+		this.alicePubKey = rsaUtils.loadCertificate(new File("../myroot/alice.crt"));
+		this.bobPubKey   = rsaUtils.loadCertificate(new File("../myroot/bob.crt"));
+		this.privateKey  = rsaUtils.loadPrivKey(new File("../myroot/server.pk8"));
 		
 		try {
 			InputStream in = new FileInputStream("database.json");
@@ -144,10 +144,19 @@ class MyChatServer extends ChatServer {
 
 				// Whoever is sending it must be already logged in
 				if ((IsA && statA != "") || (!IsA && statB != "")) {
+					
+					String msg  = rsaUtils.Decrypt(new String(p.data, StandardCharsets.UTF_8), privateKey);
+					PublicKey recipientPubKey = IsA ?  bobPubKey : alicePubKey;
+					p.data = rsaUtils.Encrypt(msg, recipientPubKey).getBytes();
+					
 					// Forward the original packet to the recipient
 					SendtoClient(!IsA, buf);
-					String msg  = rsaUtils.Decrypt(new String(p.data, StandardCharsets.UTF_8), privateKey);
-					System.out.println(msg);
+				
+//					//Encrypt Message using the Server's Public key
+//					String msg = RSAUtils.Encrypt(msg, );
+//					message = msg.getBytes();
+
+					
 					p.request = ChatRequest.CHAT_ACK;
 					p.uid = (IsA ? statB : statA);
 
