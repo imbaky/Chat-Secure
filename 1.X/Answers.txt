@@ -37,3 +37,9 @@ Subject Public Key info: this is the public key of entity, along with an algorit
  
  I) Taiwan GRCA (from Taiwan)
 	Staat der Nederlanden Root CA (From Netherland)
+
+J)It uses a protocol named Online Certificate Status Protocol (OCSP), to check the status of a certificate. OCSP returns "good" or "revoked".
+
+K) Initially the browser vendor chooses which CA is trustworthy but the user is capible of changing it to their preference.
+
+L) It would have no way to detect if the CA is malicious or not because it will be recieving the intermediate Authority.
