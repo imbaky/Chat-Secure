@@ -23,7 +23,16 @@ C)"Equifax Secure Certificate Authority" issued google's Certificates.
  
  
  G)
+ The X.509 standard defines the information to can go into a certificate and their format.
  
+Version: The version of X.509 standard which applies to this certificate
+Serial Number: The entity that created the certificates generates a serial number to distinguish them from one another.
+Signature Algorithm: The Algorithm used by the CA to sign the Certificate
+Issuer Name: The name of the entity that issues the certificate.
+Validity Period: this is the period in which the certificate is valid.
+Subject Name:The name of the entity whose public key is used in the certificate.
+Subject Public Key info: this is the public key of entity, along with an algorithm identifier.
+
  H)There are 97 root CA
  
  I) Taiwan GRCA (from Taiwan)
