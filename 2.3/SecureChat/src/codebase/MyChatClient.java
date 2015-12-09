@@ -65,11 +65,10 @@ class MyChatClient extends ChatClient {
 								// preserve
 		super(IsA); // IsA indicates whether it's client A or B
 		startComm(); // starts the communication
+		
 		File serverCert = new File("../myroot/server.crt");
-		this.rsaUtils=new RSAUtils();
+		this.rsaUtils   = new RSAUtils();
 		serverPublicKey = rsaUtils.loadCertificate(serverCert);
-		
-		
 		
 	}
 
@@ -152,6 +151,11 @@ class MyChatClient extends ChatClient {
 		ChatPacket p = new ChatPacket();
 		p.request = ChatRequest.CHAT;
 		p.uid = curUser;
+		
+		//Encrypt Message using the Server's Public key
+		String msg = RSAUtils.Encrypt(new String(message, StandardCharsets.UTF_8), serverPublicKey);
+		message = msg.getBytes();
+		
 		p.data = message;
 		SerializeNSend(p);
 	}
