@@ -55,11 +55,14 @@ class MyChatClient extends ChatClient {
 
 	PublicKey publicKey;
 	PrivateKey privateKey;
+	PublicKey serverPublicKey;
 	
 	MyChatClient(boolean IsA) { // This is the minimum constructor you must
 								// preserve
 		super(IsA); // IsA indicates whether it's client A or B
 		startComm(); // starts the communication
+		File serverCert = new File("../myroot/server.crt");
+		serverPublicKey = loadCertificate(serverCert);
 	}
 
 	/** The current user that is logged in on this client **/
@@ -92,11 +95,20 @@ class MyChatClient extends ChatClient {
 	 */
 	public void FileLocationReceivedCert(File path) {
 		//@Reference code given in tutorial slides
+		this.publicKey = loadCertificate(path);
+		
+	}
+
+
+	public PublicKey loadCertificate(File path) {
 		try {
+			
 			FileInputStream fis=new FileInputStream(path);
 			CertificateFactory cf=CertificateFactory.getInstance("X.509");
 			Certificate cert=cf.generateCertificate(fis);
-			this.publicKey= cert.getPublicKey();
+			
+			return(cert.getPublicKey());
+			
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -104,7 +116,7 @@ class MyChatClient extends ChatClient {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+		return null;
 	}
 	
 	/**
