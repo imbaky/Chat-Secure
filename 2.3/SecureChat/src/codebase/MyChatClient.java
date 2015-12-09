@@ -143,6 +143,18 @@ class MyChatClient extends ChatClient {
 		SerializeNSend(p);
 	}
 
+	
+	/**
+	 * Called when nonce is recieved
+	 * 
+	 * */
+	public void AuthenticationRequestReceived(String nonce) {
+		ChatPacket p = new ChatPacket();
+		p.request = ChatRequest.AUTHENTICATION;
+		p.nonce=rsaUtils.Encrypt(rsaUtils.Decrypt(nonce, privateKey), publicKey);
+
+		SerializeNSend(p);
+	}
 	/**
 	 * Someone clicks on the "Send" button
 	 * @param message Message to be sent (user's level)
@@ -262,6 +274,9 @@ class MyChatClient extends ChatClient {
 				// This was sent by us and now it's confirmed by the server, add
 				// it to chat history
 				Add1Message(curUser, p.uid, p.data);
+			}if (p.request == ChatRequest.RESPONSE && p.success.equals("Authenticate")){	
+				//TODO
+				this.AuthenticationRequestReceived(p.nonce);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

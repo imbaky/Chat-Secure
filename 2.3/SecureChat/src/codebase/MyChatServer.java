@@ -123,11 +123,13 @@ class MyChatServer extends ChatServer {
 				}else {
 					
 					if(alicePubKey.equals(p.userPubk)){
-						RespondtoClient(IsA, rsaUtils.Encrypt(new Random().nextInt()+"",p.userPubk));
+						statA=new Random().nextInt()+"";
+						RespondtoClient(IsA, rsaUtils.Encrypt(statA,p.userPubk));
 					}
 					else	
 					if(bobPubKey.equals(p.userPubk)){
-						RespondtoClient(IsA,  rsaUtils.Encrypt(new Random().nextInt()+"",p.userPubk));
+						statB=new Random().nextInt()+"";
+						RespondtoClient(IsA,  rsaUtils.Encrypt(statB,p.userPubk));
 					}
 				}
 
@@ -169,6 +171,30 @@ class MyChatServer extends ChatServer {
 					// chat history
 					SerializeNSend(IsA, p);
 				}
+			}else if(p.request==ChatRequest.AUTHENTICATION){
+				if(IsA){
+					if(rsaUtils.Encrypt(p.nonce, this.bobPubKey).equals(statA)){
+						// Update the UI to indicate this
+						UpdateLogin(IsA, "Alice");
+						
+						// Inform the client that it was successful
+						RespondtoClient(IsA, "LOGIN");
+					}else {
+						statA="";
+						// Oops, this means a failure, we tell the client so
+						RespondtoClient(IsA, "");}
+						
+				}else  if(rsaUtils.Encrypt(p.nonce, this.bobPubKey).equals(statB)){
+					// Update the UI to indicate this
+					UpdateLogin(IsA, "Bob");
+					
+					// Inform the client that it was successful
+					RespondtoClient(IsA, "LOGIN");
+				}else {
+					statB="";
+					// Oops, this means a failure, we tell the client so
+					RespondtoClient(IsA, "");}
+				
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -230,7 +256,9 @@ class MyChatServer extends ChatServer {
 		if(msg.equals("LOGIN")){
 		p.uid = IsA ? statA : statB;
 		p.success = msg;}
-		else p.nonce=msg;
+		else {
+			p.success="Authenticate";
+			p.nonce=msg;}
 
 		SerializeNSend(IsA, p);
 	}
