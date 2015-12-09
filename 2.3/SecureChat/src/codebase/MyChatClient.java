@@ -15,8 +15,12 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
@@ -25,9 +29,11 @@ import javax.json.JsonWriter;
 
 import infrastructure.ChatClient;
 import java.security.interfaces.RSAPublicKey;
+import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.cert.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
@@ -47,8 +53,8 @@ import java.security.interfaces.RSAPrivateKey;
  */
 class MyChatClient extends ChatClient {
 
-	RSAPublicKey publicKey;
-	RSAPrivateKey privateKey;
+	PublicKey publicKey;
+	PrivateKey privateKey;
 	
 	MyChatClient(boolean IsA) { // This is the minimum constructor you must
 								// preserve
@@ -90,7 +96,7 @@ class MyChatClient extends ChatClient {
 			FileInputStream fis=new FileInputStream(path);
 			CertificateFactory cf=CertificateFactory.getInstance("X.509");
 			Certificate cert=cf.generateCertificate(fis);
-			this.publicKey=(RSAPublicKey) cert.getPublicKey();
+			this.publicKey= cert.getPublicKey();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -119,6 +125,7 @@ class MyChatClient extends ChatClient {
 			    PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
 			    KeyFactory kf = KeyFactory.getInstance("RSA");
 			    PrivateKey privateKey =  kf.generatePrivate(spec);
+			    this.privateKey= privateKey;
 			    System.out.println(privateKey.getFormat());
 		}catch(Exception e){
 			
@@ -135,6 +142,31 @@ class MyChatClient extends ChatClient {
 	 */
 	public void ReceivedMode(boolean IsPWD) {
 		// TODO
+		try {
+			Cipher cipher=Cipher.getInstance("RSA/ECB/PKCS1Padding");
+			cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+			byte [] cipherText=cipher.doFinal("Hello".getBytes());
+			System.err.println(cipherText);
+		
+			cipher.init(Cipher.DECRYPT_MODE, privateKey);
+			System.err.println(new String(cipher.doFinal(cipherText), StandardCharsets.UTF_8));
+			
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchPaddingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidKeyException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalBlockSizeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (BadPaddingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 
